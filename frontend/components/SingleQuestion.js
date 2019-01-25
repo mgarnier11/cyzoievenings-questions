@@ -11,6 +11,7 @@ class SingleQuestion extends Component {
         };
         this.handleUpdateClick = this.handleUpdateClick.bind(this);
         this.handleDeleteClick = this.handleDeleteClick.bind(this);
+        this.handleHideClick = this.handleHideClick.bind(this);
 
 
     }
@@ -34,7 +35,7 @@ class SingleQuestion extends Component {
     }
 
     handleHideClick() {
-        console.log('Hide');
+        this.props.handleHideClick(this.state.question);
     }
 
     render() {
@@ -50,7 +51,7 @@ class SingleQuestion extends Component {
                     <td className="questionCell actions">
                         <button className="btn btn-primary" onClick={this.handleUpdateClick}>Update</button>
                         <button className="btn btn-danger" onClick={this.handleDeleteClick}>Delete</button>
-                        <button className="btn btn-success" onClick={this.handleHideClick}>{(question.hidden ? 'Show' : 'Hide')}</button>
+                        <button className="btn btn-success btnHidden" onClick={this.handleHideClick}>{(question.hidden ? 'Show' : 'Hide')}</button>
                     </td>
                 </tr>
             );

@@ -12,7 +12,11 @@
   }
   
   .actions {
-    width: 246px;
+    width: 255px;
+  }
+
+  .btnHidden {
+    width: 68px;
   }
   
   .sorter {

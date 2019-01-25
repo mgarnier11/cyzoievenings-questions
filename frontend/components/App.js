@@ -1,5 +1,6 @@
 import React from 'react'
 import { Component } from 'react';
+import Switch from 'react-switch';
 
 import io from 'socket.io-client';
 
@@ -8,6 +9,7 @@ import QuestionModal from './QuestionModal';
 import DeleteModal from './DeleteModal';
 
 var backend = 'https://my-game-backend.herokuapp.com/';
+backend = 'http://localhost:3000'
 
 class App extends Component {
     constructor(props) {
@@ -24,7 +26,8 @@ class App extends Component {
             modalQuestionUuid: '',
             questionModal: false,
             questionToDelete: null,
-            deleteModal: false
+            deleteModal: false,
+            hideHidden: true
         };
         this.socket = io(backend);
 
@@ -35,6 +38,8 @@ class App extends Component {
 
         this.handleUpdateClick = this.handleUpdateClick.bind(this);
         this.handleDeleteClick = this.handleDeleteClick.bind(this);
+        this.handleSwitchChange = this.handleSwitchChange.bind(this);
+        this.handleHideClick = this.handleHideClick.bind(this);
 
         this.openDeleteModal = this.openDeleteModal.bind(this);
         this.closeDeleteModal = this.closeDeleteModal.bind(this);
@@ -161,7 +166,13 @@ class App extends Component {
 
     }
 
+    handleSwitchChange(checked) {
+        this.setState({ hideHidden: checked });
+    }
 
+    handleHideClick(question) {
+        this.socket.emit('switchHideQuestion', {uuid: question.uuid, hidden: question.hidden, text: question.text, type: question.type, difficulty: question.difficulty});
+    }
 
     render() {
         return (
@@ -189,6 +200,7 @@ class App extends Component {
                     <option value="4">4</option>
                     <option value="5">5</option>
                 </select>
+                <Switch onChange={this.handleSwitchChange} checked={this.state.hideHidden} id="normal-switch" className="switchButton menuItem" />
                 <hr id="afterSort" />
                 <table className="table table-hover table-striped table-bordered">
                     <thead>
@@ -211,9 +223,17 @@ class App extends Component {
         if (lstQuestions) {
             return (
                 lstQuestions.map((question) => {
-                    if (this.isDisplayed(question)) return (<SingleQuestion question={question} lstTypes={this.state.lstTypes} key={question.uuid} handleUpdateClick={this.handleUpdateClick} handleDeleteClick={this.handleDeleteClick} />)
+                    if (this.isHidden(question)) return (<SingleQuestion question={question} lstTypes={this.state.lstTypes} key={question.uuid} handleUpdateClick={this.handleUpdateClick} handleDeleteClick={this.handleDeleteClick} handleHideClick={this.handleHideClick}/>)
                 })
             )
+        }
+    }
+
+    isHidden(question) {
+        if (this.state.hideHidden && question.hidden) {
+            return false;
+        } else {
+            return this.isDisplayed(question);
         }
     }
 
