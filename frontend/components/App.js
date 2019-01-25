@@ -7,7 +7,6 @@ import SingleQuestion from './SingleQuestion';
 import QuestionModal from './QuestionModal';
 import DeleteModal from './DeleteModal';
 
-
 var backend = 'https://my-game-backend.herokuapp.com/';
 
 class App extends Component {
@@ -17,6 +16,8 @@ class App extends Component {
         this.state = {
             lstQuestions: [],
             lstTypes: [],
+            sortQuestionType: '0',
+            sortDifficulty: '0',
             modalQuestionText: '',
             modalQuestionType: '',
             modalQuestionDifficulty: '1',
@@ -38,6 +39,10 @@ class App extends Component {
         this.openDeleteModal = this.openDeleteModal.bind(this);
         this.closeDeleteModal = this.closeDeleteModal.bind(this);
         this.deleteQuestion = this.deleteQuestion.bind(this);
+
+        this.onSortTypeChange = this.onSortTypeChange.bind(this);
+        this.onSortDifficultyChange = this.onSortDifficultyChange.bind(this);
+
     }
 
     componentDidMount() {
@@ -147,6 +152,17 @@ class App extends Component {
         this.setState({ deleteModal: false });
     }
 
+    onSortTypeChange(e) {
+        this.setState({ sortQuestionType: e.target.value })
+    }
+
+    onSortDifficultyChange(e) {
+        this.setState({ sortDifficulty: e.target.value })
+
+    }
+
+
+
     render() {
         return (
             <div className="container app">
@@ -157,7 +173,23 @@ class App extends Component {
                     uuid: this.state.modalQuestionUuid
                 }} />
                 <DeleteModal modalIsOpen={this.state.deleteModal} yes={this.deleteQuestion} no={this.closeDeleteModal} deleteQuestion={this.deleteQuestion} question={this.state.questionToDelete} />
-                <button className="btn btn-primary" onClick={this.handleCreateClick}>Create new Question</button>
+                <hr />
+                <button className="btn btn-primary menuItem" onClick={this.handleCreateClick}>Create new Question</button>
+                <select className="form-control menuItem" id="sortType" value={this.state.sortQuestionType} onChange={this.onSortTypeChange}>
+                    <option value="0">None</option>
+                    {this.state.lstTypes.map(type => {
+                        return (<option value={type.id} key={type.id}>{type.value}</option>)
+                    })}
+                </select>
+                <select className="form-control menuItem" id="selectDifficulty" value={this.state.sortDifficulty} onChange={this.onSortDifficultyChange}>
+                    <option value="0">None</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+                <hr id="afterSort" />
                 <table className="table table-hover table-striped table-bordered">
                     <thead>
                         <tr>
@@ -179,9 +211,37 @@ class App extends Component {
         if (lstQuestions) {
             return (
                 lstQuestions.map((question) => {
-                    return (<SingleQuestion question={question} lstTypes={this.state.lstTypes} key={question.uuid} handleUpdateClick={this.handleUpdateClick} handleDeleteClick={this.handleDeleteClick} />)
+                    if (this.isDisplayed(question)) return (<SingleQuestion question={question} lstTypes={this.state.lstTypes} key={question.uuid} handleUpdateClick={this.handleUpdateClick} handleDeleteClick={this.handleDeleteClick} />)
                 })
             )
+        }
+    }
+
+    isDisplayed(question) {
+        if (this.state.sortQuestionType == '0' && this.state.sortDifficulty == '0') return true;
+        else if (this.state.sortQuestionType != '0' && this.state.sortDifficulty == '0') {
+            return this.sortQuestionType(question);
+        } else if (this.state.sortDifficulty != '0' && this.state.sortQuestionType == '0') {
+            return this.sortDifficulty(question);
+        } else {
+            if (this.state.sortDifficulty == question.difficulty && this.state.sortQuestionType == question.type) return true;
+            else return false;
+        }
+    }
+
+    sortDifficulty(question) {
+        if (this.state.sortDifficulty == '0') return true;
+        else {
+            if (this.state.sortDifficulty == question.difficulty) return true;
+            else return false;
+        }
+    }
+
+    sortQuestionType(question) {
+        if (this.state.sortQuestionType == '0') return true;
+        else {
+            if (this.state.sortQuestionType == question.type) return true;
+            else return false;
         }
     }
 }

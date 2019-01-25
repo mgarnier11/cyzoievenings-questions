@@ -54,3 +54,17 @@
   margin-left: 2px;
   margin-right: 2px;
 }
+
+.menuItem {
+  float: left;
+  margin-left: 10px;
+  margin-right: 10px;
+  width: calc(25% - 20px);
+}
+
+#afterSort {
+  margin-top: 0;
+  padding-top: 1rem;
+  border-bottom: 1px solid rgba(0,0,0,.1);
+  border-top: 0;
+}
