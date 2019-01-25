@@ -79,7 +79,7 @@ class QuestionModal extends React.Component {
                         <label htmlFor="selectType">Question Type</label>
                         <select className="form-control" id="selectType" name="questionType" value={this.state.questionType} onChange={this.onSelectQuestionTypeChange}>
                             {this.state.lstTypes.map(type => {
-                                return (<option value={type.id} key={i}>{type.value}</option>)
+                                return (<option value={type.id} key={type.id}>{type.value}</option>)
                             })}
                         </select>
                     </div>
