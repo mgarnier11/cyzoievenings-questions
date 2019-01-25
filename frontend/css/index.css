@@ -1,0 +1,56 @@
+
+  a {
+    color: #00B7FF;
+  }
+  
+  .type {
+    width: 100px;
+  }
+  
+  .difficulty {
+    width: 115px;
+  }
+  
+  .actions {
+    width: 246px;
+  }
+  
+  .sorter {
+    float: left;
+    width: 50%;
+  }
+
+  .actions .btn {
+      margin-left: 2px;
+      margin-right: 2px;
+  }
+  
+  hr {
+    clear: both;
+  }
+
+  
+.questionModal, .deleteQuestionModal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  border: 1px solid rgb(204, 204, 204);
+  background: rgb(255, 255, 255);
+  overflow: auto;
+  border-radius: 4px;
+  outline: none;
+  padding: 20px;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+}
+
+.questionModal .last, .deleteQuestionModal .last {
+  margin-bottom: 0;
+}
+
+.deleteQuestionModal .btn {
+  margin-left: 2px;
+  margin-right: 2px;
+}
