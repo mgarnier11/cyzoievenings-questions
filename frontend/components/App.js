@@ -48,7 +48,8 @@ class App extends Component {
     }
 
     onHideQuestionClick = question => e => {
-        this.socket.emit('switchHideQuestion', question);
+        console.log(question);
+        //this.socket.emit('switchHideQuestion', question);
     }
 
     onCreateQuestionClick() {
