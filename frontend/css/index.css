@@ -33,8 +33,8 @@ hr {
   	clear: both;
 }
 
-  
 .questionModal, .deleteQuestionModal {
+	width: 450px;
 	position: absolute;
 	top: 50%;
 	left: 50%;
@@ -54,17 +54,14 @@ hr {
  	margin-bottom: 0;
 }
 
-.deleteQuestionModal .btn {
-	margin-left: 2px;
-	margin-right: 2px;
-}
-
 .menuItem {
+	/*
 	float: left;
 	margin-left: 10px;
 	margin-right: 10px;
 	height: 28px;
 	padding: 0;
+	*/
 }
 
 .sortType {
@@ -80,4 +77,8 @@ hr {
 	padding-top: 1rem;
 	border-bottom: 1px solid rgba(0,0,0,.1);
 	border-top: 0;
+}
+
+.app {
+	margin-top: 20px;
 }

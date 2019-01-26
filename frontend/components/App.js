@@ -85,8 +85,8 @@ class App extends Component {
         this.setState({sortDifficulty: e.target.value}, () => this.setQuestionDisplayed())
     }
 
-    onSortHiddenChange(checked) {
-        this.setState({ hideHidden: checked }, () => this.setQuestionDisplayed());
+    onSortHiddenChange() {
+        this.setState({ hideHidden: !this.state.hideHidden }, () => this.setQuestionDisplayed());
     }
 
     setQuestionDisplayed() {
@@ -153,29 +153,29 @@ class App extends Component {
             <div className="container app">
                 <QuestionModal modalIsOpen={this.state.questionModalOpenned} accept={this.onAcceptQuestionModal} deny={this.onDenyQuestionModal} lstTypes={this.state.lstTypes} question={this.state.question}/>
                 <DeleteModal modalIsOpen={this.state.deleteModalOpenned} accept={this.onAcceptDeleteModal} deny={this.onDenyDeleteModal} question={this.state.question} />
-                <hr />
-                <button className="btn btn-primary menuItem" onClick={this.onCreateQuestionClick}>Create new Question</button>
-                <div className="menuItem">Sort Types</div>
-                <select className="form-control menuItem sortType" value={this.state.sortType} onChange={this.onSortTypeChange}>
-                    <option value="0">None</option>
-                    {this.state.lstTypes.map(type => {
-                        return (<option value={type.id} key={type.id}>{type.value}</option>)
-                    })}
-                </select>
-                <div className="menuItem">Sort Difficulty</div>
-                <select className="form-control menuItem sortDifficulty" value={this.state.sortDifficulty} onChange={this.onSortDifficultyChange}>
-                    <option value="0">None</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                </select>
-                <div className="menuItem">Hide Hidden</div>
-                <Switch className="switchButton menuItem" checked={this.state.hideHidden} onChange={this.onSortHiddenChange} />
-                <hr id="afterSort" />
+                <div className="form-row">
+                    <button className="form-group col-md-2 btn btn-primary" onClick={this.onCreateQuestionClick}>Create new Question</button>
+                    <div className="form-group col-md-4">
+                        <label>Sort Types</label>
+                        <select className="form-control" value={this.state.sortType} onChange={this.onSortTypeChange}>
+                            <option value="0">None</option>
+                            {this.state.lstTypes.map(type => {
+                                return (<option value={type.id} key={type.id}>{type.value}</option>)
+                            })}
+                        </select>
+                    </div>
+                    <div className="form-group col-md-4">
+                        <label>Sort Difficulty</label>
+                        <select className="form-control" value={this.state.sortDifficulty} onChange={this.onSortDifficultyChange}>
+                            <option value="0" key={0}>None</option>
+                            {[1,2,3,4,5].map(nb => {
+                                return(<option value={nb} key={nb}>{nb}</option>)
+                            })}
+                        </select>
+                    </div>
+                    <button className={"form-group col-md-2 btn btn-" + (this.state.hideHidden ? "warning": "success")} onClick={this.onSortHiddenChange}>{(this.state.hideHidden? "Show Hiddens": "Hide Hiddens")}</button>
+                </div>
                 {this.state.lstQuestionsDisplayed.length} Questions displayed
-                <hr/>
                 <table className="table table-hover table-striped table-bordered">
                     <thead>
                         <tr>
@@ -198,10 +198,12 @@ class App extends Component {
     renderSingleQuestion(question) {
         if (question) {
             return (
-                <tr className="listItem">
+                <tr className="listItem" key={question.uuid}>
                     <td>{question.text}</td>
                     {this.renderType(question.type)}
-                    {this.renderStars(question.difficulty)}
+                    <td className="questionCell difficulty">
+                        {this.renderStars(question.difficulty)}
+                    </td>
                     <td className="questionCell actions">
                         <button className="btn btn-primary" onClick={this.onUpdateQuestionClick(question)}>Update</button>
                         <button className="btn btn-danger" onClick={this.onDeleteQuestionClick(question)}>Delete</button>
@@ -224,9 +226,7 @@ class App extends Component {
         }
 
         return (
-            <td className="questionCell difficulty">
-                {stars.map(star => { return (star) })}
-            </td>
+            stars.map(star => { return (star) })
         )
     }
 
