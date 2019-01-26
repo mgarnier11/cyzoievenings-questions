@@ -11,7 +11,7 @@ function importAll(r) {
 const styles = importAll(require.context('./css', false, /\.css$/));
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.min.js'
+import 'bootstrap/dist/js/bootstrap.min.js';
 
 import 'react-tippy/dist/tippy.css'
 

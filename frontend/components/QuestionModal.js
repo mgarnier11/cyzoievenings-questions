@@ -13,10 +13,10 @@ class QuestionModal extends React.Component {
         super(props, context);
 
         this.state = {
-            questionText: (this.props.question.text | ""),
-            questionDifficulty: (this.props.question.difficulty | "1"),
-            questionType: (this.props.question.type | "1"),
-            questionUuid: this.props.question.uuid,
+            questionText: "",
+            questionDifficulty: 1,
+            questionType: 1,
+            questionUuid: '',
             lstTypes: this.props.lstTypes
         };
 
@@ -24,17 +24,17 @@ class QuestionModal extends React.Component {
         this.onSelectQuestionDifficultyChange = this.onSelectQuestionDifficultyChange.bind(this);
         this.onSelectQuestionTypeChange = this.onSelectQuestionTypeChange.bind(this);
 
-        this.onSendClick = this.onSendClick.bind(this);
+        this.accept = this.accept.bind(this);
 
     }
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.question) {
             this.setState({
-                questionText: nextProps.question.text,
-                questionDifficulty: nextProps.question.difficulty,
-                questionType: nextProps.question.type,
-                questionUuid: nextProps.question.uuid
+                questionText: (nextProps.question.text || ''),
+                questionDifficulty: (nextProps.question.difficulty || 1),
+                questionType: (nextProps.question.type ? nextProps.question.type.id || 1 : 1),
+                questionUuid: (nextProps.question.uuid || "")
 
             })
         }
@@ -53,9 +53,13 @@ class QuestionModal extends React.Component {
         this.setState({ questionType: e.target.value })
     }
 
-    onSendClick() {
-        this.props.upsertQuestion({ text: this.state.questionText, type: parseInt(this.state.questionType), difficulty: parseInt(this.state.questionDifficulty), uuid: this.state.questionUuid });
-        this.setState({ questionText: '', questionType: '1', questionDifficulty: '1', questionUuid: '' });
+    accept() {
+        this.props.accept({ 
+            uuid: this.state.questionUuid,
+            text: this.state.questionText, 
+            type: parseInt(this.state.questionType), 
+            difficulty: parseInt(this.state.questionDifficulty)
+        })
     }
 
 
@@ -94,10 +98,10 @@ class QuestionModal extends React.Component {
                         </select>
                     </div>
                     <div className="form-group">
-                        <button className="btn btn-primary col-md-12" onClick={this.onSendClick}>Send Question</button>
+                        <button className="btn btn-primary col-md-12" onClick={this.accept}>Send Question</button>
                     </div>
                     <div className="form-group last">
-                        <button className="btn btn-primary col-md-12" onClick={this.props.close}>Cancel</button>
+                        <button className="btn btn-primary col-md-12" onClick={this.props.deny}>Cancel</button>
                     </div>
                 </div>
             </Modal>

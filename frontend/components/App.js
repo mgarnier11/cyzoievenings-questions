@@ -4,12 +4,10 @@ import Switch from 'react-switch';
 
 import io from 'socket.io-client';
 
-import SingleQuestion from './SingleQuestion';
 import QuestionModal from './QuestionModal';
 import DeleteModal from './DeleteModal';
 
 var backend = 'https://my-game-backend.herokuapp.com/';
-backend = 'http://localhost:3000'
 
 class App extends Component {
     constructor(props) {
@@ -17,37 +15,88 @@ class App extends Component {
 
         this.state = {
             lstQuestions: [],
+            lstQuestionsDisplayed: [],
             lstTypes: [],
-            sortQuestionType: '0',
+            question: null,
+            questionModalOpenned: false,
+            deleteModalOpenned: false,
             sortDifficulty: '0',
-            modalQuestionText: '',
-            modalQuestionType: '',
-            modalQuestionDifficulty: '1',
-            modalQuestionUuid: '',
-            questionModal: false,
-            questionToDelete: null,
-            deleteModal: false,
+            sortType: '0',
             hideHidden: true
         };
         this.socket = io(backend);
 
-        this.handleCreateClick = this.handleCreateClick.bind(this);
-        this.openQuestionModal = this.openQuestionModal.bind(this);
-        this.closeQuestionModal = this.closeQuestionModal.bind(this);
-        this.upsertQuestion = this.upsertQuestion.bind(this);
+        this.onCreateQuestionClick = this.onCreateQuestionClick.bind(this);
 
-        this.handleUpdateClick = this.handleUpdateClick.bind(this);
-        this.handleDeleteClick = this.handleDeleteClick.bind(this);
-        this.handleSwitchChange = this.handleSwitchChange.bind(this);
-        this.handleHideClick = this.handleHideClick.bind(this);
+        this.onAcceptQuestionModal = this.onAcceptQuestionModal.bind(this);
+        this.onDenyQuestionModal = this.onDenyQuestionModal.bind(this);
 
-        this.openDeleteModal = this.openDeleteModal.bind(this);
-        this.closeDeleteModal = this.closeDeleteModal.bind(this);
-        this.deleteQuestion = this.deleteQuestion.bind(this);
+        this.onAcceptDeleteModal = this.onAcceptDeleteModal.bind(this);
+        this.onDenyDeleteModal = this.onDenyDeleteModal.bind(this);
 
-        this.onSortTypeChange = this.onSortTypeChange.bind(this);
         this.onSortDifficultyChange = this.onSortDifficultyChange.bind(this);
+        this.onSortTypeChange = this.onSortTypeChange.bind(this);
+        this.onSortHiddenChange = this.onSortHiddenChange.bind(this);
+    }
 
+    onUpdateQuestionClick = question => e => {
+        this.setState({question: question, questionModalOpenned: true})
+    }
+
+    onDeleteQuestionClick = question => e => {
+        this.setState({question: question, deleteModalOpenned: true})
+    }
+
+    onHideQuestionClick = question => e => {
+        this.socket.emit('switchHideQuestion', question);
+    }
+
+    onCreateQuestionClick() {
+        this.setState({question: {}, questionModalOpenned: true})
+    }
+
+    onAcceptQuestionModal(question) {
+        this.socket.emit('upsertQuestion', question);
+
+        this.setState({questionModalOpenned: false});
+    }
+
+    onDenyQuestionModal() {
+        this.setState({questionModalOpenned: false});
+    }
+
+    onAcceptDeleteModal(question) {
+        question.type = question.type.id;
+
+        this.socket.emit('deleteQuestion', question);
+
+        this.setState({deleteModalOpenned: false});
+    }
+
+    onDenyDeleteModal() {
+        this.setState({deleteModalOpenned: false});
+    }
+
+    onSortTypeChange(e) {
+        this.setState({sortType: e.target.value}, () => this.setQuestionDisplayed());
+    }
+    
+    onSortDifficultyChange(e) {
+        this.setState({sortDifficulty: e.target.value}, () => this.setQuestionDisplayed())
+    }
+
+    onSortHiddenChange(checked) {
+        this.setState({ hideHidden: checked }, () => this.setQuestionDisplayed());
+    }
+
+    setQuestionDisplayed() {
+        let tmpLstQuestions = [];
+
+        this.state.lstQuestions.forEach(question => {
+            if (this.isHidden(question)) tmpLstQuestions.push(question);
+        });
+
+        this.setState({lstQuestionsDisplayed: tmpLstQuestions});
     }
 
     componentDidMount() {
@@ -55,7 +104,7 @@ class App extends Component {
         this.socket.emit('getListTypes');
 
         this.socket.on('returnListQuestions', (lst) => {
-            this.setState({ lstQuestions: lst });
+            this.setState({ lstQuestions: lst }, () => this.setQuestionDisplayed());
         });
 
         this.socket.on('returnListTypes', (lst) => {
@@ -65,7 +114,7 @@ class App extends Component {
         this.socket.on('questionAdded', (question) => {
             let tmpLstQuestions = [...this.state.lstQuestions];
             tmpLstQuestions.unshift(question);
-            this.setState({ lstQuestions: tmpLstQuestions });
+            this.setState({ lstQuestions: tmpLstQuestions }, () => this.setQuestionDisplayed());
         });
 
         this.socket.on('questionDeleted', (question) => {
@@ -79,7 +128,7 @@ class App extends Component {
                 tmpLstQuestions.splice(i, 1)
             }
 
-            this.setState({ lstQuestions: tmpLstQuestions });
+            this.setState({ lstQuestions: tmpLstQuestions }, () => this.setQuestionDisplayed());
 
         });
 
@@ -94,105 +143,27 @@ class App extends Component {
                 tmpLstQuestions[i] = question;
             }
 
-            this.setState({ lstQuestions: tmpLstQuestions });
+            this.setState({ lstQuestions: tmpLstQuestions }, () => this.setQuestionDisplayed());
 
         });
-    }
-
-    openQuestionModal() {
-        this.setState({ questionModal: true });
-    }
-
-    upsertQuestion(question) {
-        this.setState({ questionModal: false });
-
-        this.socket.emit('upsertQuestion', question);
-    }
-
-    closeQuestionModal() {
-        this.setState({ questionModal: false });
-    }
-
-    handleCreateClick() {
-        this.setState({
-            modalQuestionText: '',
-            modalQuestionType: '1',
-            modalQuestionDifficulty: '1',
-            modalQuestionUuid: ''
-        }, () => {
-            this.openQuestionModal();
-        });
-    }
-
-    handleUpdateClick(question) {
-        this.setState({
-            modalQuestionText: question.text,
-            modalQuestionType: question.type,
-            modalQuestionDifficulty: question.difficulty,
-            modalQuestionUuid: question.uuid
-        }, () => {
-            this.openQuestionModal();
-        });
-
-    }
-
-    handleDeleteClick(question) {
-        this.setState({ questionToDelete: question }, () => {
-            this.openDeleteModal();
-        });
-    }
-
-    openDeleteModal() {
-
-        this.setState({ deleteModal: true });
-    }
-
-    deleteQuestion(question) {
-        this.setState({ deleteModal: false });
-
-        this.socket.emit('deleteQuestion', question);
-    }
-
-    closeDeleteModal() {
-        this.setState({ deleteModal: false });
-    }
-
-    onSortTypeChange(e) {
-        this.setState({ sortQuestionType: e.target.value })
-    }
-
-    onSortDifficultyChange(e) {
-        this.setState({ sortDifficulty: e.target.value })
-
-    }
-
-    handleSwitchChange(checked) {
-        this.setState({ hideHidden: checked });
-    }
-
-    handleHideClick(question) {
-        this.socket.emit('switchHideQuestion', {uuid: question.uuid, hidden: question.hidden, text: question.text, type: question.type, difficulty: question.difficulty});
     }
 
     render() {
         return (
             <div className="container app">
-                <QuestionModal modalIsOpen={this.state.questionModal} upsertQuestion={this.upsertQuestion} close={this.closeQuestionModal} lstTypes={this.state.lstTypes} question={{
-                    text: this.state.modalQuestionText,
-                    type: this.state.modalQuestionType,
-                    difficulty: this.state.modalQuestionDifficulty,
-                    uuid: this.state.modalQuestionUuid
-                }} />
-                <DeleteModal modalIsOpen={this.state.deleteModal} yes={this.deleteQuestion} no={this.closeDeleteModal} deleteQuestion={this.deleteQuestion} question={this.state.questionToDelete} />
+                <QuestionModal modalIsOpen={this.state.questionModalOpenned} accept={this.onAcceptQuestionModal} deny={this.onDenyQuestionModal} lstTypes={this.state.lstTypes} question={this.state.question}/>
+                <DeleteModal modalIsOpen={this.state.deleteModalOpenned} accept={this.onAcceptDeleteModal} deny={this.onDenyDeleteModal} question={this.state.question} />
                 <hr />
-                <button className="btn btn-primary menuItem" onClick={this.handleCreateClick}>Create new Question</button>
-                <select className="form-control menuItem" id="sortType" value={this.state.sortQuestionType} onChange={this.onSortTypeChange}>
+                <button className="btn btn-primary menuItem" onClick={this.onCreateQuestionClick}>Create new Question</button>
+                <div className="menuItem">Sort Types</div>
+                <select className="form-control menuItem sortType" value={this.state.sortType} onChange={this.onSortTypeChange}>
                     <option value="0">None</option>
                     {this.state.lstTypes.map(type => {
                         return (<option value={type.id} key={type.id}>{type.value}</option>)
                     })}
                 </select>
-                <select className="form-control menuItem" id="selectDifficulty" value={this.state.sortDifficulty} onChange={this.onSortDifficultyChange}>
+                <div className="menuItem">Sort Difficulty</div>
+                <select className="form-control menuItem sortDifficulty" value={this.state.sortDifficulty} onChange={this.onSortDifficultyChange}>
                     <option value="0">None</option>
                     <option value="1">1</option>
                     <option value="2">2</option>
@@ -200,7 +171,8 @@ class App extends Component {
                     <option value="4">4</option>
                     <option value="5">5</option>
                 </select>
-                <Switch onChange={this.handleSwitchChange} checked={this.state.hideHidden} id="normal-switch" className="switchButton menuItem" />
+                <div className="menuItem">Hide Hidden</div>
+                <Switch className="switchButton menuItem" checked={this.state.hideHidden} onChange={this.onSortHiddenChange} />
                 <hr id="afterSort" />
                 <table className="table table-hover table-striped table-bordered">
                     <thead>
@@ -212,21 +184,48 @@ class App extends Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {this.renderList(this.state.lstQuestions)}
+                        {this.state.lstQuestionsDisplayed.map((question) => {
+                            return this.renderSingleQuestion(question);
+                        })}
                     </tbody>
                 </table>
             </div>
         )
     }
 
-    renderList(lstQuestions) {
-        if (lstQuestions) {
+    renderSingleQuestion(question) {
+        if (question) {
             return (
-                lstQuestions.map((question) => {
-                    if (this.isHidden(question)) return (<SingleQuestion question={question} lstTypes={this.state.lstTypes} key={question.uuid} handleUpdateClick={this.handleUpdateClick} handleDeleteClick={this.handleDeleteClick} handleHideClick={this.handleHideClick}/>)
-                })
-            )
+                <tr className="listItem">
+                    <td>{question.text}</td>
+                    {this.renderType(question.type)}
+                    {this.renderStars(question.difficulty)}
+                    <td className="questionCell actions">
+                        <button className="btn btn-primary" onClick={this.onUpdateQuestionClick(question)}>Update</button>
+                        <button className="btn btn-danger" onClick={this.onDeleteQuestionClick(question)}>Delete</button>
+                        <button className={"btn btn-" + (question.hidden ? 'warning' : 'success') + " btnHidden"} onClick={this.onHideQuestionClick(question)}>{(question.hidden ? 'Show' : 'Hide')}</button>
+                    </td>
+                </tr>
+            );
         }
+    }
+
+    renderType(type) {
+        if (type) return (<td className="questionCell type text-center"><span>{type.value}</span></td>);
+    }
+
+    renderStars(nb) {
+        var stars = [];
+        for (var i = 0; i < 5; i++) {
+            if (i < nb) stars.push(<i className="fas fa-star" key={i}></i>);
+            else stars.push(<i className="far fa-star" key={i}></i>);
+        }
+
+        return (
+            <td className="questionCell difficulty">
+                {stars.map(star => { return (star) })}
+            </td>
+        )
     }
 
     isHidden(question) {
@@ -238,13 +237,13 @@ class App extends Component {
     }
 
     isDisplayed(question) {
-        if (this.state.sortQuestionType == '0' && this.state.sortDifficulty == '0') return true;
-        else if (this.state.sortQuestionType != '0' && this.state.sortDifficulty == '0') {
-            return this.sortQuestionType(question);
-        } else if (this.state.sortDifficulty != '0' && this.state.sortQuestionType == '0') {
+        if (this.state.sortType == '0' && this.state.sortDifficulty == '0') return true;
+        else if (this.state.sortType != '0' && this.state.sortDifficulty == '0') {
+            return this.sortType(question);
+        } else if (this.state.sortDifficulty != '0' && this.state.sortType == '0') {
             return this.sortDifficulty(question);
         } else {
-            if (this.state.sortDifficulty == question.difficulty && this.state.sortQuestionType == question.type) return true;
+            if (this.state.sortDifficulty == question.difficulty && this.state.sortType == question.type.id) return true;
             else return false;
         }
     }
@@ -257,10 +256,10 @@ class App extends Component {
         }
     }
 
-    sortQuestionType(question) {
-        if (this.state.sortQuestionType == '0') return true;
+    sortType(question) {
+        if (this.state.sortType == '0') return true;
         else {
-            if (this.state.sortQuestionType == question.type) return true;
+            if (this.state.sortType == question.type.id) return true;
             else return false;
         }
     }

@@ -16,15 +16,15 @@ class DeleteModal extends React.Component {
             question: this.props.question
         };
 
-        this.yes = this.yes.bind(this);
+        this.accept = this.accept.bind(this);
     }
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.question) this.setState({ question: nextProps.question });
     }
 
-    yes() {
-        this.props.deleteQuestion(this.state.question);
+    accept() {
+        this.props.accept(this.state.question);
     }
 
     /**
@@ -44,8 +44,8 @@ class DeleteModal extends React.Component {
                         {(this.state.question ? this.state.question.text : '')}
                     </div>
                     <div className="form-group text-center">
-                        <button className="btn btn-primary" onClick={this.yes}>Yes</button>
-                        <button className="btn btn-primary" onClick={this.props.no}>No</button>
+                        <button className="btn btn-primary" onClick={this.accept}>Yes</button>
+                        <button className="btn btn-primary" onClick={this.props.deny}>No</button>
                     </div>
                 </div>
             </Modal>

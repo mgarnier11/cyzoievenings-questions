@@ -1,74 +1,83 @@
 
-  a {
+a {
     color: #00B7FF;
-  }
+}
   
-  .type {
+.type {
     width: 100px;
-  }
+}
   
-  .difficulty {
+.difficulty {
     width: 115px;
-  }
+}
   
-  .actions {
-    width: 255px;
-  }
+.actions {
+	width: 255px;
+}
 
-  .btnHidden {
+.btnHidden {
     width: 68px;
-  }
+}
   
-  .sorter {
+.sorter {
     float: left;
     width: 50%;
-  }
+}
 
-  .actions .btn {
-      margin-left: 2px;
-      margin-right: 2px;
-  }
+.actions .btn {
+  	margin-left: 2px;
+  	margin-right: 2px;
+}
   
-  hr {
-    clear: both;
-  }
+hr {
+  	clear: both;
+}
 
   
 .questionModal, .deleteQuestionModal {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  right: auto;
-  bottom: auto;
-  border: 1px solid rgb(204, 204, 204);
-  background: rgb(255, 255, 255);
-  overflow: auto;
-  border-radius: 4px;
-  outline: none;
-  padding: 20px;
-  margin-right: -50%;
-  transform: translate(-50%, -50%);
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	right: auto;
+	bottom: auto;
+	border: 1px solid rgb(204, 204, 204);
+	background: rgb(255, 255, 255);
+	overflow: auto;
+	border-radius: 4px;
+	outline: none;
+	padding: 20px;
+	margin-right: -50%;
+	transform: translate(-50%, -50%);
 }
 
 .questionModal .last, .deleteQuestionModal .last {
-  margin-bottom: 0;
+ 	margin-bottom: 0;
 }
 
 .deleteQuestionModal .btn {
-  margin-left: 2px;
-  margin-right: 2px;
+	margin-left: 2px;
+	margin-right: 2px;
 }
 
 .menuItem {
-  float: left;
-  margin-left: 10px;
-  margin-right: 10px;
-  width: calc(25% - 20px);
+	float: left;
+	margin-left: 10px;
+	margin-right: 10px;
+	height: 28px;
+	padding: 0;
+}
+
+.sortType {
+	width: 180px;
+}
+
+.sortDifficulty {
+	width: 100px;
 }
 
 #afterSort {
-  margin-top: 0;
-  padding-top: 1rem;
-  border-bottom: 1px solid rgba(0,0,0,.1);
-  border-top: 0;
+	margin-top: 0;
+	padding-top: 1rem;
+	border-bottom: 1px solid rgba(0,0,0,.1);
+	border-top: 0;
 }
