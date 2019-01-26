@@ -174,6 +174,8 @@ class App extends Component {
                 <div className="menuItem">Hide Hidden</div>
                 <Switch className="switchButton menuItem" checked={this.state.hideHidden} onChange={this.onSortHiddenChange} />
                 <hr id="afterSort" />
+                {this.state.lstQuestionsDisplayed.length} Questions displayed
+                <hr/>
                 <table className="table table-hover table-striped table-bordered">
                     <thead>
                         <tr>
