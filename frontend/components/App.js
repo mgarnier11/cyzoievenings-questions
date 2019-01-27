@@ -41,7 +41,7 @@ class App extends Component {
 
         this.onSortDifficultyChange = this.onSortDifficultyChange.bind(this);
         this.onSortTypeChange = this.onSortTypeChange.bind(this);
-        this.onSortHiddenChange = this.onSortHiddenChange.bind(this);
+        this.onSortHiddenClick = this.onSortHiddenClick.bind(this);
     }
 
     onUpdateQuestionClick(question) {
@@ -88,8 +88,7 @@ class App extends Component {
         this.setState({ sortDifficulty: e.target.value }, () => this.setQuestionDisplayed())
     }
 
-    onSortHiddenChange() {
-        console.log('test');
+    onSortHiddenClick() {
         this.setState({ hideHidden: !this.state.hideHidden }, () => this.setQuestionDisplayed());
     }
 
@@ -164,7 +163,7 @@ class App extends Component {
                     onCreateQuestionClick={this.onCreateQuestionClick}
                     onSortTypeChange={this.onSortTypeChange}
                     onSortDifficultyChange={this.onSortDifficultyChange}
-                    onSortHiddenChange={this.onSortHiddenChange}
+                    onSortHiddenClick={this.onSortHiddenClick}
                     hideHidden={this.state.hideHidden}
 
 

@@ -44,7 +44,7 @@ class SortMenu extends Component {
                         })}
                     </select>
                 </div>
-                <button className={"form-group col-md-2 btn btn-" + (this.props.hideHidden ? "warning" : "success")} onClick={this.props.onSortHiddenChange}>
+                <button className={"form-group col-md-2 btn btn-" + (this.props.hideHidden ? "warning" : "success")} onClick={this.props.onSortHiddenClick}>
                     {(this.props.hideHidden ? "Show Hiddens" : "Hide Hiddens")}
                 </button>
             </div>
