@@ -8,8 +8,7 @@ import DeleteModal from './DeleteModal';
 import SingleQuestion from './SingleQuestion';
 import SortMenu from './SortMenu';
 
-var backend = 'https://my-game-backend.herokuapp.com/';
-backend = 'http://localhost:3000'
+var backend = 'https://cyzoievenings-backend.herokuapp.com/';
 
 class App extends Component {
     constructor(props) {
