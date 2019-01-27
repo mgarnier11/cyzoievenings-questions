@@ -8,6 +8,7 @@ import QuestionModal from './QuestionModal';
 import DeleteModal from './DeleteModal';
 
 var backend = 'https://my-game-backend.herokuapp.com/';
+backend = 'http://localhost:3000'
 
 class App extends Component {
     constructor(props) {
@@ -49,7 +50,7 @@ class App extends Component {
 
     onHideQuestionClick = question => e => {
         console.log(question);
-        //this.socket.emit('switchHideQuestion', question);
+        this.socket.emit('switchHideQuestion', question);
     }
 
     onCreateQuestionClick() {
@@ -67,8 +68,6 @@ class App extends Component {
     }
 
     onAcceptDeleteModal(question) {
-        question.type = question.type.id;
-
         this.socket.emit('deleteQuestion', question);
 
         this.setState({deleteModalOpenned: false});
@@ -122,7 +121,7 @@ class App extends Component {
             let tmpLstQuestions = [...this.state.lstQuestions];
 
             let i = tmpLstQuestions.findIndex((q) => {
-                return q.uuid == question.uuid;
+                return q.id == question.id;
             });
 
             if (i > -1) {
@@ -137,7 +136,7 @@ class App extends Component {
             let tmpLstQuestions = [...this.state.lstQuestions];
 
             let i = tmpLstQuestions.findIndex((q) => {
-                return q.uuid == question.uuid;
+                return q.id == question.id;
             });
 
             if (i > -1) {
@@ -201,7 +200,9 @@ class App extends Component {
             return (
                 <tr className="listItem" key={question.uuid}>
                     <td>{question.text}</td>
-                    {this.renderType(question.type)}
+                    <td className="questionCell type text-center">
+                    {(question.type ? question.type.value: '')}
+                    </td>
                     <td className="questionCell difficulty">
                         {this.renderStars(question.difficulty)}
                     </td>
@@ -213,10 +214,6 @@ class App extends Component {
                 </tr>
             );
         }
-    }
-
-    renderType(type) {
-        if (type) return (<td className="questionCell type text-center"><span>{type.value}</span></td>);
     }
 
     renderStars(nb) {

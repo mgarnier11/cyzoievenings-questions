@@ -13,10 +13,10 @@ class QuestionModal extends React.Component {
         super(props, context);
 
         this.state = {
-            questionText: "",
+            questionText: '',
             questionDifficulty: 1,
-            questionType: 1,
-            questionUuid: '',
+            questionTypeId: 1,
+            questionId: '',
             lstTypes: this.props.lstTypes
         };
 
@@ -33,8 +33,8 @@ class QuestionModal extends React.Component {
             this.setState({
                 questionText: (nextProps.question.text || ''),
                 questionDifficulty: (nextProps.question.difficulty || 1),
-                questionType: (nextProps.question.type ? nextProps.question.type.id || 1 : 1),
-                questionUuid: (nextProps.question.uuid || "")
+                questionTypeId: (nextProps.question.typeId || 1),
+                questionId: (nextProps.question.id || "")
 
             })
         }
@@ -50,14 +50,14 @@ class QuestionModal extends React.Component {
     }
 
     onSelectQuestionTypeChange(e) {
-        this.setState({ questionType: e.target.value })
+        this.setState({ questionTypeId: e.target.value })
     }
 
     accept() {
         this.props.accept({ 
-            uuid: this.state.questionUuid,
+            id: this.state.questionId,
             text: this.state.questionText, 
-            type: parseInt(this.state.questionType), 
+            typeId: parseInt(this.state.questionTypeId), 
             difficulty: parseInt(this.state.questionDifficulty)
         })
     }
@@ -83,7 +83,7 @@ class QuestionModal extends React.Component {
                     <div className="form-row">
                         <div className="form-group col-md-6">
                             <label htmlFor="selectType">Question Type</label>
-                            <select className="form-control" id="selectType" name="questionType" value={this.state.questionType} onChange={this.onSelectQuestionTypeChange}>
+                            <select className="form-control" id="selectType" name="questionType" value={this.state.questionTypeId} onChange={this.onSelectQuestionTypeChange}>
                                 {this.state.lstTypes.map(type => {
                                     return (<option value={type.id} key={type.id}>{type.value}</option>)
                                 })}
