@@ -1,11 +1,12 @@
 import React from 'react'
 import { Component } from 'react';
-import Switch from 'react-switch';
 
 import io from 'socket.io-client';
 
 import QuestionModal from './QuestionModal';
 import DeleteModal from './DeleteModal';
+import SingleQuestion from './SingleQuestion';
+import SortMenu from './SortMenu';
 
 var backend = 'https://my-game-backend.herokuapp.com/';
 backend = 'http://localhost:3000'
@@ -28,6 +29,9 @@ class App extends Component {
         this.socket = io(backend);
 
         this.onCreateQuestionClick = this.onCreateQuestionClick.bind(this);
+        this.onUpdateQuestionClick = this.onUpdateQuestionClick.bind(this);
+        this.onDeleteQuestionClick = this.onDeleteQuestionClick.bind(this);
+        this.onHideQuestionClick = this.onHideQuestionClick.bind(this);
 
         this.onAcceptQuestionModal = this.onAcceptQuestionModal.bind(this);
         this.onDenyQuestionModal = this.onDenyQuestionModal.bind(this);
@@ -40,49 +44,48 @@ class App extends Component {
         this.onSortHiddenChange = this.onSortHiddenChange.bind(this);
     }
 
-    onUpdateQuestionClick = question => e => {
-        this.setState({question: question, questionModalOpenned: true})
+    onUpdateQuestionClick(question) {
+        this.setState({ question: question, questionModalOpenned: true })
     }
 
-    onDeleteQuestionClick = question => e => {
-        this.setState({question: question, deleteModalOpenned: true})
+    onDeleteQuestionClick(question) {
+        this.setState({ question: question, deleteModalOpenned: true })
     }
 
-    onHideQuestionClick = question => e => {
-        console.log(question);
+    onHideQuestionClick(question) {
         this.socket.emit('switchHideQuestion', question);
     }
 
     onCreateQuestionClick() {
-        this.setState({question: {}, questionModalOpenned: true})
+        this.setState({ question: {}, questionModalOpenned: true })
     }
 
     onAcceptQuestionModal(question) {
         this.socket.emit('upsertQuestion', question);
 
-        this.setState({questionModalOpenned: false});
+        this.setState({ questionModalOpenned: false });
     }
 
     onDenyQuestionModal() {
-        this.setState({questionModalOpenned: false});
+        this.setState({ questionModalOpenned: false });
     }
 
     onAcceptDeleteModal(question) {
         this.socket.emit('deleteQuestion', question);
 
-        this.setState({deleteModalOpenned: false});
+        this.setState({ deleteModalOpenned: false });
     }
 
     onDenyDeleteModal() {
-        this.setState({deleteModalOpenned: false});
+        this.setState({ deleteModalOpenned: false });
     }
 
     onSortTypeChange(e) {
-        this.setState({sortType: e.target.value}, () => this.setQuestionDisplayed());
+        this.setState({ sortType: e.target.value }, () => this.setQuestionDisplayed());
     }
-    
+
     onSortDifficultyChange(e) {
-        this.setState({sortDifficulty: e.target.value}, () => this.setQuestionDisplayed())
+        this.setState({ sortDifficulty: e.target.value }, () => this.setQuestionDisplayed())
     }
 
     onSortHiddenChange() {
@@ -96,7 +99,7 @@ class App extends Component {
             if (this.isHidden(question)) tmpLstQuestions.push(question);
         });
 
-        this.setState({lstQuestionsDisplayed: tmpLstQuestions});
+        this.setState({ lstQuestionsDisplayed: tmpLstQuestions });
     }
 
     componentDidMount() {
@@ -151,30 +154,19 @@ class App extends Component {
     render() {
         return (
             <div className="container app">
-                <QuestionModal modalIsOpen={this.state.questionModalOpenned} accept={this.onAcceptQuestionModal} deny={this.onDenyQuestionModal} lstTypes={this.state.lstTypes} question={this.state.question}/>
+                <QuestionModal modalIsOpen={this.state.questionModalOpenned} accept={this.onAcceptQuestionModal} deny={this.onDenyQuestionModal} lstTypes={this.state.lstTypes} question={this.state.question} />
                 <DeleteModal modalIsOpen={this.state.deleteModalOpenned} accept={this.onAcceptDeleteModal} deny={this.onDenyDeleteModal} question={this.state.question} />
-                <div className="form-row">
-                    <button className="form-group col-md-2 btn btn-primary" onClick={this.onCreateQuestionClick}>Create new Question</button>
-                    <div className="form-group col-md-4">
-                        <label>Sort Types</label>
-                        <select className="form-control" value={this.state.sortType} onChange={this.onSortTypeChange}>
-                            <option value="0">None</option>
-                            {this.state.lstTypes.map(type => {
-                                return (<option value={type.id} key={type.id}>{type.value}</option>)
-                            })}
-                        </select>
-                    </div>
-                    <div className="form-group col-md-4">
-                        <label>Sort Difficulty</label>
-                        <select className="form-control" value={this.state.sortDifficulty} onChange={this.onSortDifficultyChange}>
-                            <option value="0" key={0}>None</option>
-                            {[1,2,3,4,5].map(nb => {
-                                return(<option value={nb} key={nb}>{nb}</option>)
-                            })}
-                        </select>
-                    </div>
-                    <button className={"form-group col-md-2 btn btn-" + (this.state.hideHidden ? "warning": "success")} onClick={this.onSortHiddenChange}>{(this.state.hideHidden? "Show Hiddens": "Hide Hiddens")}</button>
-                </div>
+                <SortMenu
+                    lstTypes={this.state.lstTypes}
+                    sortType={this.state.sortType}
+                    sortDifficulty={this.state.sortDifficulty}
+                    onCreateQuestionClick={this.onCreateQuestionClick}
+                    onSortTypeChange={this.onSortTypeChange}
+                    onSortDifficultyChange={this.onSortDifficultyChange}
+                    onSortHiddenChange={this.onSortHiddenChange}
+
+
+                />
                 {this.state.lstQuestionsDisplayed.length} Questions displayed
                 <table className="table table-hover table-striped table-bordered">
                     <thead>
@@ -187,44 +179,16 @@ class App extends Component {
                     </thead>
                     <tbody>
                         {this.state.lstQuestionsDisplayed.map((question) => {
-                            return this.renderSingleQuestion(question);
+                            return (<SingleQuestion
+                                question={question}
+                                onUpdateQuestionClick={this.onUpdateQuestionClick}
+                                onDeleteQuestionClick={this.onDeleteQuestionClick}
+                                onHideQuestionClick={this.onHideQuestionClick}
+                            />)
                         })}
                     </tbody>
                 </table>
             </div>
-        )
-    }
-
-    renderSingleQuestion(question) {
-        if (question) {
-            return (
-                <tr className="listItem" key={question.uuid}>
-                    <td>{question.text}</td>
-                    <td className="questionCell type text-center">
-                    {(question.type ? question.type.value: '')}
-                    </td>
-                    <td className="questionCell difficulty">
-                        {this.renderStars(question.difficulty)}
-                    </td>
-                    <td className="questionCell actions">
-                        <button className="btn btn-primary" onClick={this.onUpdateQuestionClick(question)}>Update</button>
-                        <button className="btn btn-danger" onClick={this.onDeleteQuestionClick(question)}>Delete</button>
-                        <button className={"btn btn-" + (question.hidden ? 'warning' : 'success') + " btnHidden"} onClick={this.onHideQuestionClick(question)}>{(question.hidden ? 'Show' : 'Hide')}</button>
-                    </td>
-                </tr>
-            );
-        }
-    }
-
-    renderStars(nb) {
-        var stars = [];
-        for (var i = 0; i < 5; i++) {
-            if (i < nb) stars.push(<i className="fas fa-star" key={i}></i>);
-            else stars.push(<i className="far fa-star" key={i}></i>);
-        }
-
-        return (
-            stars.map(star => { return (star) })
         )
     }
 
