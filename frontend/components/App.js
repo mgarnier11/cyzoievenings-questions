@@ -89,6 +89,7 @@ class App extends Component {
     }
 
     onSortHiddenChange() {
+        console.log('test');
         this.setState({ hideHidden: !this.state.hideHidden }, () => this.setQuestionDisplayed());
     }
 
@@ -164,6 +165,7 @@ class App extends Component {
                     onSortTypeChange={this.onSortTypeChange}
                     onSortDifficultyChange={this.onSortDifficultyChange}
                     onSortHiddenChange={this.onSortHiddenChange}
+                    hideHidden={this.state.hideHidden}
 
 
                 />
